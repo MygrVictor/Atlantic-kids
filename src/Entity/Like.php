@@ -31,6 +31,10 @@ class Like
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\ManyToOne(targetEntity: Article::class)]
+    #[ORM\JoinColumn(name: 'article_id', referencedColumnName: 'id', nullable: false)]
+    private ?Article $article = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -81,6 +85,18 @@ class Like
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getArticle(): ?Article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(?Article $article): self
+    {
+        $this->article = $article;
 
         return $this;
     }

@@ -1,5 +1,5 @@
 <?php
-// src/Security/UserAuthenticator.php
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,6 +22,7 @@ class UserAuthenticator extends AbstractAuthenticator
     use TargetPathTrait;
 
     public const LOGIN_ROUTE = 'app_login';
+   
 
     public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
@@ -29,35 +30,50 @@ class UserAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): bool
     {
-        return $request->attributes->get('_route') === self::LOGIN_ROUTE && $request->isMethod('POST');
-    }
-
-    public function authenticate(Request $request): Passport
-    {
-        $email = $request->request->get('email');
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
-
-        return new Passport(
-            new UserBadge($email),
-            new PasswordCredentials($request->request->get('password')),
-            [
-                new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
-                new RememberMeBadge(),
-            ]
+        // Supporte les requêtes de la route de connexion (POST) et la route de création de vidéo (POST)
+        return (
+            ($request->attributes->get('_route') === self::LOGIN_ROUTE && $request->isMethod('POST')) 
+           
         );
     }
 
+    public function authenticate(Request $request): Passport
+{
+    $email = $request->request->get('email');
+    
+    // Vérifie si l'email est bien défini
+    if (empty($email)) {
+        throw new AuthenticationException('Email is required.');
+    }
+
+    $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+
+    return new Passport(
+        new UserBadge($email), // Le paramètre attendu ici doit être une chaîne (email)
+        new PasswordCredentials($request->request->get('password')),
+        [
+            new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
+            new RememberMeBadge(),
+        ]
+    );
+}
+
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        // Redirection vers la page précédente si elle existe, sinon vers la page d'accueil
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_main'));
+        return new RedirectResponse($this->urlGenerator->generate('app_user'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
+        // Message flash en cas d'échec d'authentification
+        $request->getSession()->getFlashBag()->add('error', 'Invalid credentials.');
+
         return new RedirectResponse($this->urlGenerator->generate(self::LOGIN_ROUTE));
     }
 }

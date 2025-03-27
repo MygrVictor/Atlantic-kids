@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\UserRepository;
@@ -9,19 +10,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(uniqueConstraints: [new ORM\UniqueConstraint(name: 'email_unique', columns: ['email'])])]
-#[UniqueEntity(fields: ['email'], message: 'IL y a deja un compte avec cet Email')]
-class User implements UserInterface , PasswordAuthenticatedUserInterface
+#[ORM\Table(name: 'user')]
+#[ORM\UniqueConstraint(name: 'email_unique', columns: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'Il y a déjà un compte avec cet email')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-     // Ajout de la propriété roles
-     #[ORM\Column(type: "json")]
-     private array $roles = [];
+    // Ajout de la propriété roles
+    #[ORM\Column(type: "json")]
+    private array $roles = [];
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -38,7 +41,6 @@ class User implements UserInterface , PasswordAuthenticatedUserInterface
     private ?string $username = null;
 
     #[ORM\Column(length: 255)]
-
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -126,8 +128,6 @@ class User implements UserInterface , PasswordAuthenticatedUserInterface
     }
 
     // Implémentation de UserInterface
-
-    
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -136,6 +136,7 @@ class User implements UserInterface , PasswordAuthenticatedUserInterface
 
         return array_unique($roles);
     }
+
     public function eraseCredentials(): void
     {
         // Effacer les données sensibles si nécessaire
@@ -157,7 +158,6 @@ class User implements UserInterface , PasswordAuthenticatedUserInterface
         $this->username = $username;
         return $this;
     }
-
 
     public function isVerified(): bool
     {

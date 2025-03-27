@@ -1,16 +1,25 @@
 {# templates/video/create.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block title %}Créer une vidéo{% endblock %}
 
 {% block body %}
-    <h1>Ajouter une nouvelle vidéo</h1>
+    <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold mb-6 text-center">Ajouter une nouvelle vidéo</h1>
 
-    {{ form_start(form) }}
-        {{ form_row(form.title) }}
-        {{ form_row(form.url) }}
-        {{ form_row(form.description) }}
-        <button class="btn btn-primary">Envoyer</button>
-    {{ form_end(form) }}
+        {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
+            <div class="mb-4">
+                {{ form_row(form.title, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(form.url, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+            </div>
+            <div class="mb-4">
+                {{ form_row(form.description, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+            </div>
+            <div class="text-center">
+                <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Envoyer</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}

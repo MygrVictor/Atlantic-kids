@@ -1,0 +1,33 @@
+<div class="w-64 h-full fixed top-0 left-0 z-10" style="background-color: #4F6AF3; color: white;">
+    <div class="p-4">
+        <img src="{{ asset('uploads/images/logo.png') }}" alt="Logo" class="w-full h-16 object-contain">
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="px-4 py-2">
+        <form action="{{ path('app_search') }}" method="get" class="flex items-center bg-white rounded-lg">
+            <input type="text" name="query" placeholder="Rechercher un article ou une vidéo..." class="w-full px-3 py-1 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-xs hover:shadow-xl">
+                <span class="text-lg animate-bounce">👀</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Menu de navigation -->
+    <ul class="space-y-3 mt-4">
+        {% if app.user %}
+            <!-- Utilisateur connecté -->
+            <li><a href="{{ path('app_home') }}" class="block px-4 py-2 hover:bg-gray-700">Home</a></li>
+            <li><a href="{{ path('app_article') }}" class="block px-4 py-2 hover:bg-gray-700">Articles</a></li>
+            <li><a href="{{ path('video_index') }}" class="block px-4 py-2 hover:bg-gray-700">Video</a></li>
+            <li><a href="{{ path('contact') }}" class="block px-4 py-2 hover:bg-gray-700">Contact</a></li>
+            <li><a href="{{ path('app_logout') }}" class="block px-4 py-2 hover:bg-gray-700">Déconnexion</a></li>
+        {% else %}
+            <!-- Utilisateur déconnecté -->
+            <li><a href="{{ path('app_home') }}" class="block px-4 py-2 hover:bg-gray-700">Home</a></li>
+            <li><a href="{{ path('app_article') }}" class="block px-4 py-2 hover:bg-gray-700">Articles</a></li>
+            <li><a href="{{ path('app_register') }}" class="block px-4 py-2 hover:bg-gray-700">Inscription</a></li>
+            <li><a href="{{ path('contact') }}" class="block px-4 py-2 hover:bg-gray-700">Contact</a></li>
+        {% endif %}
+    </ul>
+</div>

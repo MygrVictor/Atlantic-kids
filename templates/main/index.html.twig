@@ -1,20 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Bienvenue {% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="ml-64 p-4">
+    <h1 class="text-3xl font-semibold text-center my-8">Fil d'actualité</h1>
 
-<div class="example-wrapper">
-    <h1>Bienvenue, {{ app.user ? app.user.username: 'Invité' }}! ✅</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        {% for item in content %}
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                
+                {% if item is instance of(App\Entity\Video) %}
+                    <!-- Afficher la vidéo -->
+                    <img src="{{ item.thumbnail }}" alt="Thumbnail de la vidéo" class="w-full h-64 object-cover">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-semibold">{{ item.title }}</h2>
+                        <p class="text-sm text-gray-600 mt-2"><strong>Publiée le :</strong> {{ item.createdAt|date('d/m/Y') }}</p>
+                        <a href="{{ path('video_show', {'id': item.id}) }}" class="text-blue-500 hover:text-blue-700 mt-2 inline-block">Voir la vidéo</a>
+                    </div>
 
-    <p>Ce message amical vient de :</p>
-    <ul>
-        <li>Votre contrôleur à <code>/Applications/MAMP/htdocs/Atlantic-kids/atlantic-Kids/src/Controller/MainController.php</code></li>
-        <li>Votre template à <code>/Applications/MAMP/htdocs/Atlantic-kids/atlantic-Kids/templates/main/index.html.twig</code></li>
-    </ul>
+                {% elseif item is instance of(App\Entity\Article) %}
+                    <!-- Afficher l'article -->
+                    {% if item.image %}
+                        <img src="{{ asset('uploads/images/' ~ item.image) }}" alt="Image de l'article" class="w-full h-64 object-cover">
+                    {% endif %}
+                    
+                    <div class="p-4">
+                        <h2 class="text-2xl font-semibold">{{ item.title }}</h2>
+                        <p class="text-sm text-gray-600 mt-2"><strong>Écrit par :</strong> {{ item.user.username }}</p>
+                        <p class="text-sm text-gray-600"><strong>Publiée le :</strong> {{ item.createdAt|date('d/m/Y') }}</p>
+                        <p class="text-gray-700 mt-4">{{ item.content|slice(0, 150) }}... <a href="{{ path('article_show', {id: item.id}) }}" class="text-blue-500 hover:text-blue-700">Lire la suite</a></p>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="col-span-full text-center text-gray-600">Aucun contenu trouvé.</p>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

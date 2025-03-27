@@ -1,141 +1,86 @@
 {% extends 'base.html.twig' %}
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>
-		{% block title %}Profil de {{ user.username }}{% endblock %}
-	</title>
-	
-	{% block javascripts %}
-		{{ importmap('app') }}
-		<script>
-			document.addEventListener('DOMContentLoaded', function () {
-				const editBtn = document.getElementById('edit-btn');
-				const editForm = document.getElementById('edit-form');
+{% block body %}
+<div class="ml-64 p-4">
+<div class="min-h-screen bg-gray-100 flex items-start justify-center">
+    <div class="w-full max-w-7xl  grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Section Profil -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-6">
+                <div class="w-24 h-24 mx-auto mb-4">
+                    {% if user.profilPicture %}
+                        <img class="rounded-full border" src="{{ asset('uploads/images/profile_pictures/' ~ user.profilPicture) }}" alt="Photo de profil">
+                    {% else %}
+                        <img class="rounded-full border" src="{{ asset('uploads/images/photoprofil.jpg') }}" alt="Photo de profil par défaut">
+                    {% endif %}
+                </div>
+                <h1 class="text-3xl font-bold text-gray-700">{{ user.username }}</h1>
+                <p class="text-lg text-gray-500">{{ user.email }}</p>
+            </div>
 
-				// Cacher les champs de modification par défaut
-				editForm.style.display = 'none';
+            <div class="mt-6">
+                <h2 class="text-lg font-semibold text-gray-700">À propos</h2>
+                <p class="text-gray-600">{{ user.bio ? user.bio : 'Pas de bio définie.' }}</p>
+            </div>
 
-				// Lorsque l'utilisateur clique sur le bouton, alterner l'affichage du formulaire
-				editBtn.addEventListener('click', function () {
-					if (editForm.style.display === 'none') {
-						editForm.style.display = 'block';
-					} else {
-						editForm.style.display = 'none';
-					}
-				});
-			});
-		</script>
-	{% endblock %}
-</head>
+            <div class="mt-6 text-center">
+                <button id="edit-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Modifier le profil
+                </button>
+            </div>
 
-<body>
-	
+            <div id="edit-form" class="hidden mt-6">
+                <form method="post" action="{{ path('update_profile') }}" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                        <input type="text" name="username" value="{{ user.username }}" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Bio</label>
+                        <textarea name="bio" rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">{{ user.bio ? user.bio : '' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Photo de profil</label>
+                        <input type="file" name="profil_picture" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        Mettre à jour
+                    </button>
+                </form>
+            </div>
+        </div>
 
-	<!-- Profil -->
-	{% block body %}
-		<div>
-			<div>
-				<!-- Photo de profil et informations en haut -->
-				<div class="text-center">
-					<div>
-						<!-- Photo de profil centrée -->
-<div class="inline-block">
-    {% if user.profilPicture %}
-        <img src="{{ asset('uploads/profile_pictures/' ~ user.profilPicture) }}" alt="Photo de profil" width="100" height="100">
-    {% else %}
-        <img src="{{ asset('img/photoprofil.jpg') }}" alt="Photo de profil par défaut" width="300" height="300">
-    {% endif %}
+        <!-- Section Articles -->
+        <div class="col-span-2 bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-semibold text-gray-700">Mes articles</h2>
+            {% if articles is empty %}
+                <p class="text-gray-500">Aucun article pour le moment.</p>
+            {% else %}
+                <ul class="space-y-4">
+                    {% for article in articles %}
+                        <li class="p-4 bg-gray-50 rounded-lg">
+                            <p class="text-gray-700 font-medium">{{ article.user.username }}</p>
+                            <p class="text-gray-500 text-sm">{{ article.createdAt|date('d/m/Y - H:i') }}</p>
+                            <p class="mt-2 text-gray-600">{{ article.content }}</p>
+                            {% if article.image %}
+                                <img class="mt-2 rounded-lg" src="{{ asset('uploads/images/' ~ article.image) }}" alt="Image de l'article">
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
-					</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const editBtn = document.getElementById('edit-btn');
+    const editForm = document.getElementById('edit-form');
 
-					<!-- Nom d'utilisateur -->
-					<h1>{{ user.username }}</h1>
-					<p>{{ user.email }}</p>
-				</div>
-
-				<!-- Bio -->
-				<div class="text-center">
-					<h2>Un petit mot sur moi</h2>
-					<p>
-						{{ user.bio ? user.bio : 'Pas de bio définie.' }}
-					</p>
-				</div>
-
-				<!-- Bouton Modifier -->
-				<div class="text-center">
-					<button id="edit-btn">
-						Modifier vos informations
-					</button>
-				</div>
-
-				<!-- Formulaire de mise à jour (initialement masqué) -->
-				<div id="edit-form">
-					<form method="post" action="{{ path('update_profile') }}" enctype="multipart/form-data">
-						<!-- Bloc du nom d'utilisateur -->
-						<div>
-							<h2>Modifier le nom d'utilisateur</h2>
-							<input type="text" name="username" value="{{ user.username }}">
-						</div>
-						<!-- Bloc de la bio -->
-						<div>
-							<h2>Modifier la bio</h2>
-							<textarea name="bio" rows="4" placeholder="Écrivez votre bio ici...">{{ user.bio ? user.bio : '' }}</textarea>
-						</div>
-
-						<!-- Bloc de la photo de profil -->
-						<div>
-							<h2>Modifier la photo</h2>
-							<div>
-								<label for="profil_picture">Sélectionner une nouvelle photo</label>
-								<input type="file" name="profil_picture" id="profil_picture">
-							</div>
-						</div>
-
-						<!-- Bouton pour soumettre les changements -->
-						<div class="text-center">
-							<button type="submit">
-								<span>Mettre à jour</span>
-							</button>
-						</div>
-					</form>
-				</div>
-
-				<!-- Affichage des articles -->
-				<div>
-					<h2>Mes articles</h2>
-					{% if articles is empty %}
-						<p>Aucun article pour le moment.</p>
-					{% else %}
-						<ul>
-							{% for article in articles %}
-								<li>
-									<div>
-										<div class="flex">
-											{% if article.user.profilPicture %}
-												<img src="{{ asset('uploads/profil_picture/' ~ article.user.profilPicture) }}" alt="Photo de profil">
-											{% else %}
-												 <img src="{{ asset('img/photoprofil.jpg') }}" alt="Photo de profil par défaut" width="100" height="100">
-											{% endif %}
-											<div>
-												<p>{{ article.user.username }}&nbsp;&nbsp;<span>
-														{{ article.createdAt|date('d/m/Y - H:i') }}
-													</span>
-												</p>
-												<p>{{ article.content }}</p>
-												{% if article.image %}
-													<img src="{{ asset('uploads/images/' ~ article.image) }}" alt="Image de l'article">
-												{% endif %}
-											</div>
-										</div>
-									</div>
-								</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	{% endblock %}
-</body>
+    editBtn.addEventListener('click', function () {
+        editForm.classList.toggle('hidden');
+    });
+});
+</script>
+</div>
+{% endblock %}

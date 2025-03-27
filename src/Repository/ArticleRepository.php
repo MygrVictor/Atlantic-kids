@@ -19,6 +19,18 @@ class ArticleRepository extends ServiceEntityRepository
     {
         return $this->findBy([], ['createdAt' => 'DESC']); // Trier les articles par date
     }
+    public function findBySearchQuery(string $query)
+    {
+        // Recherche dans le titre, le contenu, et par utilisateur
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u') // Joindre l'entité User (si une relation existe)
+            ->where('a.title LIKE :query')
+            ->orWhere('a.content LIKE :query')
+            ->orWhere('u.username LIKE :query') // Recherche aussi dans le nom d'utilisateur
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return Article[] Returns an array of Article objects

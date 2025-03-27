@@ -1,17 +1,64 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body class="flex">
+    <!-- Inclure la barre de navigation -->
+    {% include 'navbar.html.twig' %}
+    <div class="absolute top-4 right-6 text-gray-800">
+    {% if app.user %}
+        <a href="{{ path('app_user', { 'username': app.user.username }) }}" class="text-blue-600 hover:underline">
+            {{ app.user.username }}
+        </a>
+    {% else %}
+        <a href="{{ path('app_login') }}" class="text-gray-600 hover:underline">Se connecter</a>
+    {% endif %}
+</div>
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+    <!-- Contenu principal -->
+    <div class="flex-1 p-10 text-gray-800">
         {% block body %}{% endblock %}
-    </body>
+    </div>
+
+    <!-- Bouton flottant -->
+    <div class="fixed bottom-6 right-6">
+        <div class="relative">
+            <!-- Bouton principal -->
+            <button id="toggleMenu" class="bg-blue-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-blue-700">
+                +
+            </button>
+
+            <!-- Menu flottant -->
+            <div id="floatingMenu" class="hidden absolute bottom-16 right-0 bg-white shadow-md rounded-lg p-2 w-48">
+                <a href="{{ path('article_create') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">Créer un article</a>
+                <a href="{{ path('video_create') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">Créer une vidéo</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour gérer l'affichage du menu -->
+    <script>
+        document.getElementById('toggleMenu').addEventListener('click', function () {
+            const menu = document.getElementById('floatingMenu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Fermer le menu si on clique ailleurs
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('floatingMenu');
+            const button = document.getElementById('toggleMenu');
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
 </html>

@@ -22,8 +22,10 @@ class Video
     #[ORM\Column(length: 50)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 500)]
-    private ?string $url = null;
+    #[Assert\Url(message: "L'URL de la vidéo n'est pas valide.")]
+#[ORM\Column(length: 500)]
+private ?string $url = null;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
@@ -33,6 +35,9 @@ class Video
 
     #[ORM\OneToMany(mappedBy: 'likeable', targetEntity: Like::class)]
     private Collection $likes;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $thumbnail;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\User", inversedBy: "video")]
     #[ORM\JoinColumn(nullable: false)]
@@ -129,16 +134,30 @@ class Video
         return $this;
     }
 
- public function getIframeUrl(): ?string
-{
+    public function getIframeUrl(): ?string
+    {
+        if (preg_match('#(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/.*(?:v=|\/)([a-zA-Z0-9_-]+)#', $this->url, $matches)) {
+            $videoId = $matches[4]; // ID de la vidéo
+            return 'https://www.youtube.com/embed/' . $videoId;
+        }
+        
     
-    if (preg_match('#(https?://)?(www\.)?(youtube|youtu|youtube-nocookie)\.(com|be)/.*(?:v=|\/)([a-zA-Z0-9_-]+)#', $this->url, $matches)) {
-        $videoId = $matches[4]; // ID de la vidéo
-        return 'https://www.youtube.com/embed/' . $videoId;
+        return null;
     }
     
-    return null;
+
+    // Getter
+    public function getThumbnail(): ?string
+    {
+        return $this->thumbnail;
+    }
+
+    // Setter
+    public function setThumbnail(?string $thumbnail): self
+    {
+        $this->thumbnail = $thumbnail;
+
+        return $this;
+    }
 }
 
-
-}

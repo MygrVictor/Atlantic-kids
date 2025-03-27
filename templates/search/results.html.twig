@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultats de la recherche - {{ query }}{% endblock %}
+
+{% block body %}
+<div class="ml-64 p-4">
+<div class="container mx-auto p-4">
+    <h1 class="text-3xl font-semibold text-center mb-8">Résultats de la recherche pour <span class="text-blue-600">"{{ query }}"</span></h1>
+
+    <!-- Section Articles -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-4">Articles</h2>
+        <ul class="space-y-4">
+            {% for article in articles %}
+                <li class="p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition">
+                    <h3 class="text-xl font-medium text-gray-800">{{ article.title }}</h3>
+                    <p class="text-gray-600 mt-2">{{ article.excerpt ? article.excerpt : 'Aucun résumé disponible.' }}</p>
+                    <a href="{{ path('article_show', {'id': article.id}) }}" class="text-blue-500 hover:underline mt-4 inline-block">Lire l'article</a>
+                </li>
+            {% else %}
+                <li class="p-4 bg-white rounded-lg shadow-md">Aucun article trouvé.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Section Vidéos -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-4">Vidéos</h2>
+        <ul class="space-y-4">
+            {% for video in videos %}
+                <li class="p-4 bg-white rounded-lg shadow-md hover:bg-gray-50 transition">
+                    <h3 class="text-xl font-medium text-gray-800">{{ video.title }}</h3>
+                    <p class="text-gray-600 mt-2">{{ video.description ? video.description : 'Aucune description disponible.' }}</p>
+                    <a href="{{ path('video_show', {'id': video.id}) }}" class="text-blue-500 hover:underline mt-4 inline-block">Voir la vidéo</a>
+                </li>
+            {% else %}
+                <li class="p-4 bg-white rounded-lg shadow-md">Aucune vidéo trouvée.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</div>
+</div>
+{% endblock %}

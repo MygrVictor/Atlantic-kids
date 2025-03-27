@@ -1,89 +1,99 @@
 {% extends 'base.html.twig' %}
-{% block title %}Liste des articles{% endblock %}
 
 {% block body %}
-    <h1>Tous les Articles</h1>
+<div class="ml-64 p-4">
+    <h1 class="text-3xl font-semibold text-center my-8">Tous les Articles</h1>
 
-    <div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
         {% for article in articles %}
-            <div>
-                <h2>{{ article.title }}</h2>
-                <p><strong>Auteur : </strong>{{ article.user.username }}</p>
-                <p><strong>Date de publication : </strong>{{ article.createdAt|date('d/m/Y') }}</p>
-                
-                <p>{{ article.content|slice(0, 150) }}... <a href="{{ path('article_show', {id: article.id}) }}">Lire la suite</a></p>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <!-- Image de l'article -->
+            {% if article.image %}
+                <img src="{{ asset('uploads/images/' ~ article.image) }}" alt="Image de l'article" class="w-full h-64 object-cover">
+            {% endif %}
 
-                {% if article.image %}
-                    <img src="{{ asset('uploads/images/' ~ article.image) }}" alt="Image de l'article">
-                {% endif %}
-                
-                <hr>
-                
+            <div class="p-4">
+                <!-- Titre de l'article -->
+                <h2 class="text-2xl font-semibold text-gray-800">{{ article.title }}</h2>
+
+                <!-- Auteur et date -->
+                <p class="text-sm text-gray-600 mt-2">
+                    <strong>Auteur :</strong> {{ article.user.username }}
+                </p>
+                <p class="text-sm text-gray-600">
+                    <strong>Date de publication :</strong> {{ article.createdAt|date('d/m/Y') }}
+                </p>
+
+                <!-- Contenu de l'article -->
+                <p class="text-gray-700 mt-4">{{ article.content|slice(0, 150) }}...
+                    <a href="{{ path('article_show', {id: article.id}) }}" class="text-blue-500 hover:text-blue-700">Lire la suite</a>
+                </p>
+
+                <!-- Compteur de likes et bouton de like -->
+                <div class="mt-4 flex items-center">
+                    <button class="like-button" data-article-id="{{ article.id }}">
+                        {% if app.user and article.userHasLiked(app.user) %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+{% else %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+{% endif %}
+                    </button>
+                    <span id="likes-count-{{ article.id }}" class="ml-2">{{ article.likes|length }}</span>
+                </div>
+
+                <!-- Bouton de suppression (si l'utilisateur est l'auteur) -->
                 {% if app.user and app.user.id == article.user.id %}
-                    <div class="flex justify-end">
-                        <form action="{{ path('article_delete', { id: article.id }) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')">
-                            <button type="submit" class="btn btn-danger">
-                                Supprimer
-                            </button>
-                        </form>
-                    </div>
+                    <form action="{{ path('article_delete', { id: article.id }) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')" class="mt-4">
+                        <button type="submit" class="w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none transition">Supprimer</button>
+                    </form>
                 {% endif %}
             </div>
+        </div>
         {% else %}
-            <p>Aucun article trouvé.</p>
+            <p class="col-span-full text-center text-gray-600">Aucun article trouvé.</p>
         {% endfor %}
     </div>
-    <script>document.addEventListener("DOMContentLoaded", function () {
-document.querySelectorAll('.like-button').forEach(button => {
-button.addEventListener('click', async function (event) {
-event.preventDefault();
 
-const postId = button.getAttribute('data-post-id');
-const url = `/posts/${postId}/like`;
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.addEventListener('click', async function (event) {
+                    event.preventDefault();
+                    const postId = button.getAttribute('data-article-id');
+                    const url = `/articles/${postId}/like`;
 
-try {
-const response = await fetch(url, {
-method: 'POST',
-headers: {
-'X-Requested-With': 'XMLHttpRequest',
-'Content-Type': 'application/json',
-'Accept': 'application/json'
-}
-});
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        });
 
-if (! response.ok) 
-throw new Error (`HTTP error! status: ${
-response.status
-}`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
 
+                        const data = await response.json();
+                        document.getElementById(`likes-count-${postId}`).textContent = data.likesCount;
 
-
-const data = await response.json();
-
-if (data.likesCount !== undefined && data.liked !== undefined) {
-const likesCounter = document.getElementById (`likes-count-${postId}`);
-if (likesCounter) 
-likesCounter.textContent = data.likesCount;
-
-
-
-button.setAttribute('data-liked', data.liked.toString());
-
-button.innerHTML = `
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 ${
-data.liked ? 'text-red-500' : ''
-}" fill="currentColor" viewbox="0 0 24 24">
-									<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-								</svg>
-								${
-data.likesCount
-}
-							`;
-}
-} catch (error) {
-console.error('Error:', error);
-}
-});
-});
-});</script>
+                        if (data.liked) {
+                            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+                        } else {
+                            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+                        }
+                    } catch (error) {
+                        console.error('Error during the like request:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</div>
 {% endblock %}

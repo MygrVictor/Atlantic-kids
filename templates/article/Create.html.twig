@@ -1,23 +1,46 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div>
-        <h1>Créer une publication</h1>
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <h1 class="text-3xl font-semibold text-gray-800 text-center mb-6">Créer une publication</h1>
 
         {{ form_start(form) }}
-        <div>
-            {{ form_row(form.title) }}
-        <div>
-            {{ form_widget(form.content, {'attr': {'placeholder': 'Écrivez votre contenu ici...'}}) }}
-        </div>
-        <div>
-            {{ form_row(form.image) }}
-            
-        </div>
-        <div>
-            {{ form_row(form.submit) }}
-        </div>
-        {{ form_end(form) }}
 
+        <!-- Titre de la publication -->
+        <div class="mb-4">
+            {{ form_row(form.title, {
+                'label': 'Titre',
+                'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
+            }) }}
+        </div>
+
+        <!-- Contenu de la publication -->
+        <div class="mb-4">
+            {{ form_widget(form.content, {
+                'attr': {'placeholder': 'Écrivez votre contenu ici...', 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
+            }) }}
+        </div>
+
+        <!-- Image -->
+        <div class="mb-4">
+            {{ form_row(form.image, {
+                'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
+            }) }}
+        </div>
+
+        <!-- Champ de saisie des tags -->
+        <div class="mb-4">
+            <label for="article_tagsInput" class="block text-sm font-medium text-gray-700">Tags (séparés par des virgules)</label>
+            <input type="text" id="article_tagsInput" name="article[tagsInput]" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Exemple : technologie, innovation, start-up" />
+        </div>
+
+        <!-- Bouton de soumission -->
+        <div class="text-center">
+            {{ form_row(form.submit, {
+                'attr': {'class': 'w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500'}
+            }) }}
+        </div>
+
+        {{ form_end(form) }}
     </div>
 {% endblock %}

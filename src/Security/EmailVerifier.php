@@ -18,35 +18,36 @@ class EmailVerifier
         private EntityManagerInterface $entityManager
     ) {
     }
-
     public function sendEmailConfirmation(string $verifyEmailRouteName, User $user, TemplatedEmail $email): void
     {
+        // Générer la signature pour l'email de confirmation
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
             (string) $user->getId(),
             (string) $user->getEmail()
         );
-
+    
+        // Récupérer le contexte existant de l'email
         $context = $email->getContext();
+    
+        // Ajouter les données nécessaires au contexte
+        $context['user'] = $user; // Assurez-vous que 'user' est bien passé
         $context['signedUrl'] = $signatureComponents->getSignedUrl();
         $context['expiresAtMessageKey'] = $signatureComponents->getExpirationMessageKey();
         $context['expiresAtMessageData'] = $signatureComponents->getExpirationMessageData();
-
+        
+        // Si vous avez besoin d'une clé 'expiresAt', vous pouvez la définir explicitement
+        // Exemple : Si vous souhaitez afficher une date d'expiration
+        $expiresAt = new \DateTime();
+        $expiresAt->add(new \DateInterval('PT24H')); // Date d'expiration dans 24h
+        $context['expiresAt'] = $expiresAt->format('Y-m-d H:i:s'); // Formater la date
+    
+        // Mettre à jour le contexte de l'email
         $email->context($context);
-
+    
+        // Envoyer l'email
         $this->mailer->send($email);
     }
-
-    /**
-     * @throws VerifyEmailExceptionInterface
-     */
-    public function handleEmailConfirmation(Request $request, User $user): void
-    {
-        $this->verifyEmailHelper->validateEmailConfirmationFromRequest($request, (string) $user->getId(), (string) $user->getEmail());
-
-        $user->setIsVerified(true);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-    }
-}
+    
+}    
+    

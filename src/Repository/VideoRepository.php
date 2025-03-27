@@ -15,7 +15,19 @@ class VideoRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Video::class);
     }
-
+    public function findBySearchQuery(string $query)
+    {
+        // Recherche dans le titre, la description et le nom d'utilisateur associé
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.user', 'u') // Jointure avec l'entité User
+            ->where('v.title LIKE :query')
+            ->orWhere('v.description LIKE :query')
+            ->orWhere('u.username LIKE :query') // Recherche par nom d'utilisateur
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+}
     //    /**
     //     * @return Video[] Returns an array of Video objects
     //     */
@@ -40,4 +52,4 @@ class VideoRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-}
+
