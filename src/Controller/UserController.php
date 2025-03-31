@@ -66,7 +66,9 @@ final class UserController extends AbstractController
         }
 
         // Gestion de l'upload de la photo de profil
-        $profilePicture = $request->files->get('profile_picture');
+        $profilePicture = $request->files->get('profil_picture');
+        dump($profilePicture); // Ajoute cette ligne
+die(); // Pour stopper l'exécution et voir le dump
         if ($profilePicture) {
             $newFilename = uniqid() . '.' . $profilePicture->guessExtension();
             try {

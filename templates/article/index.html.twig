@@ -29,26 +29,36 @@
                     <a href="{{ path('article_show', {id: article.id}) }}" class="text-blue-500 hover:text-blue-700">Lire la suite</a>
                 </p>
 
-                <!-- Compteur de likes et bouton de like -->
-                <div class="mt-4 flex items-center">
-                    <button class="like-button" data-article-id="{{ article.id }}">
-                        {% if app.user and article.userHasLiked(app.user) %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>
-{% else %}
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>
-{% endif %}
-                    </button>
-                    <span id="likes-count-{{ article.id }}" class="ml-2">{{ article.likes|length }}</span>
-                </div>
+                <!-- Tags de l'article -->
+                {% if article.tags is not empty %}
+                    <div class="mt-4">
+                        <strong>Tags :</strong>
+                        <div class="flex flex-wrap mt-2">
+                            {% for tag in article.tags %}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Nombre de likes -->
+                <p class="text-sm text-gray-600 mt-2">
+                    <strong>Likes :</strong> <span id="like-count-{{ article.id }}">{{ article.likes|length }}</span>
+                </p>
+
+                <!-- Bouton Like -->
+                <button id="like-button-{{ article.id }}" data-article-id="{{ article.id }}" class="like-button mt-2 px-4 py-2 bg-blue-500 text-white rounded">
+                    {% if app.user and app.user in article.likes %}
+                        Unlike
+                    {% else %}
+                        Like
+                    {% endif %}
+                </button>
 
                 <!-- Bouton de suppression (si l'utilisateur est l'auteur) -->
                 {% if app.user and app.user.id == article.user.id %}
                     <form action="{{ path('article_delete', { id: article.id }) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')" class="mt-4">
-                        <button type="submit" class="w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none transition">Supprimer</button>
+                        <button type="submit" class="w-50 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-200 focus:outline-none transition">Supprimer</button>
                     </form>
                 {% endif %}
             </div>
@@ -57,43 +67,28 @@
             <p class="col-span-full text-center text-gray-600">Aucun article trouvé.</p>
         {% endfor %}
     </div>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.like-button').forEach(button => {
-                button.addEventListener('click', async function (event) {
-                    event.preventDefault();
-                    const postId = button.getAttribute('data-article-id');
-                    const url = `/articles/${postId}/like`;
-
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        document.getElementById(`likes-count-${postId}`).textContent = data.likesCount;
-
-                        if (data.liked) {
-                            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-                        } else {
-                            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-                        }
-                    } catch (error) {
-                        console.error('Error during the like request:', error);
-                    }
-                });
+<script>
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const articleId = this.dataset.articleId;
+            fetch(`/article/${articleId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Mettre à jour le nombre de likes affiché
+                document.getElementById(`like-count-${articleId}`).textContent = data.likes;
+                // Changer le texte du bouton
+                this.textContent = data.likes === 0 ? 'Like' : 'Unlike';
             });
         });
-    </script>
-</div>
+    });
+    
+</script>
 {% endblock %}

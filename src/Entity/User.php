@@ -22,6 +22,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+ * @OneToMany(targetEntity="App\Entity\Article", mappedBy="user")
+ */
+private $articles;
+
     // Ajout de la propriété roles
     #[ORM\Column(type: "json")]
     private array $roles = [];
@@ -54,15 +59,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\Column(length: 300)]
-    private ?string $profil_picture = null;
+    #[ORM\Column(type: "string", nullable: false)]
+private ?string $profilPicture = 'default.jpg'; // Assurez-vous de définir une valeur par défaut ou de la rendre nullable
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $bio = null;
 
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: "App\Entity\Video")]
+private Collection $videos;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
+        $this->videos = new ArrayCollection();
+        $this->articles = new ArrayCollection();
     }
 
     // Getters et setters
@@ -173,15 +184,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getProfilPicture(): ?string
     {
-        return $this->profil_picture;
+        return $this->profilPicture;
     }
 
-    public function setProfilPicture(string $profil_picture): static
+    public function setProfilPicture(string $profilPicture): self
     {
-        $this->profil_picture = $profil_picture;
-
+        $this->profilPicture = $profilPicture;
         return $this;
     }
+
 
     public function getBio(): ?string
     {
@@ -194,4 +205,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getArticles(): Collection
+{
+    return $this->articles;
+}
+public function getVideos(): Collection
+{
+    return $this->videos;
+}
+
+
+
 }

@@ -1,25 +1,35 @@
-{# templates/video/create.html.twig #}
 {% extends 'base.html.twig' %}
-
-{% block title %}Créer une vidéo{% endblock %}
-
 {% block body %}
-    <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center">Ajouter une nouvelle vidéo</h1>
 
+<div class="ml-64 p-6">
+    <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Ajouter une vidéo</h2>
+        
         {{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
-            <div class="mb-4">
-                {{ form_row(form.title, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-            </div>
-            <div class="mb-4">
-                {{ form_row(form.url, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-            </div>
-            <div class="mb-4">
-                {{ form_row(form.description, {'label_attr': {'class': 'block text-gray-700 text-sm font-bold mb-2'}, 'attr': {'class': 'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-            </div>
-            <div class="text-center">
-                <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Envoyer</button>
-            </div>
+        
+        <div>
+            {{ form_label(form.title, null, {'attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.title, {'attr': {'class': 'w-full mt-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+            {{ form_errors(form.title, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+        </div>
+
+        <div>
+            {{ form_label(form.url, null, {'attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.url, {'attr': {'class': 'w-full mt-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+            {{ form_errors(form.url, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+        </div>
+
+        <div>
+            {{ form_label(form.description, null, {'attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'w-full mt-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500'}}) }}
+            {{ form_errors(form.description, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
+            Enregistrer
+        </button>
+        
         {{ form_end(form) }}
     </div>
+</div>
 {% endblock %}

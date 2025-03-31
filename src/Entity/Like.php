@@ -2,14 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\LikeRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\UX\Turbo\Attribute\Broadcast;
 
-#[ORM\Entity(repositoryClass: LikeRepository::class)]
-#[ORM\Table(name: '`like`')]
-#[Broadcast]
+#[ORM\Entity]
 class Like
 {
     #[ORM\Id]
@@ -17,87 +12,67 @@ class Like
     #[ORM\Column]
     private ?int $id = null;
 
-    // Relation ManyToOne avec l'utilisateur
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     #[ORM\Column]
-    private ?int $likeable_id = null;
+    private ?int $likeableId = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $likeable_type = null;
+    private ?string $likeableType = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: "datetime")]
+    private \DateTime $createdAt;
 
-    #[ORM\ManyToOne(targetEntity: Article::class)]
-    #[ORM\JoinColumn(name: 'article_id', referencedColumnName: 'id', nullable: false)]
-    private ?Article $article = null;
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
+    // Getters et setters
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    // Méthodes getter et setter pour l'utilisateur
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getLikeableId(): ?int
     {
-        return $this->likeable_id;
+        return $this->likeableId;
     }
 
-    public function setLikeableId(int $likeable_id): static
+    public function setLikeableId(int $likeableId): self
     {
-        $this->likeable_id = $likeable_id;
-
+        $this->likeableId = $likeableId;
         return $this;
     }
 
     public function getLikeableType(): ?string
     {
-        return $this->likeable_type;
+        return $this->likeableType;
     }
 
-    public function setLikeableType(string $likeable_type): static
+    public function setLikeableType(string $likeableType): self
     {
-        $this->likeable_type = $likeable_type;
-
+        $this->likeableType = $likeableType;
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getUser(): ?User
     {
-        return $this->created_at;
+        return $this->user;
     }
-
-    public function setCreatedAt(\DateTimeInterface $created_at): static
+    public function setUser(?User $user): self
     {
-        $this->created_at = $created_at;
-
+        $this->user = $user;
         return $this;
     }
-
-    public function getArticle(): ?Article
+    public function getCreatedAt(): ?\DateTime
     {
-        return $this->article;
+        return $this->createdAt;
     }
-
-    public function setArticle(?Article $article): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
-        $this->article = $article;
-
+        $this->createdAt = $createdAt;
         return $this;
     }
 }

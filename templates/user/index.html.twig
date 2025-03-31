@@ -8,7 +8,7 @@
             <div class="text-center mb-6">
                 <div class="w-24 h-24 mx-auto mb-4">
                     {% if user.profilPicture %}
-                        <img class="rounded-full border" src="{{ asset('uploads/images/profile_pictures/' ~ user.profilPicture) }}" alt="Photo de profil">
+                        <img class="rounded-full border" src="{{ asset('uploads/profil_pictures/' ~ user.profilPicture) }}" alt="Photo de profil">
                     {% else %}
                         <img class="rounded-full border" src="{{ asset('uploads/images/photoprofil.jpg') }}" alt="Photo de profil par défaut">
                     {% endif %}

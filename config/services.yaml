@@ -1,14 +1,24 @@
 parameters:
     images_directory: '%kernel.project_dir%/public/uploads/images'  # Déclare le paramètre ici
+    videos_directory: '%kernel.project_dir%/public/uploads/videos'    
+    profil_pictures_directory: '%kernel.project_dir%/public/uploads/profil_pictures' 
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
 
+    # Inclure tout le répertoire 'src/Form' pour les services de formulaire
+    App\Form\:
+        resource: '../src/Form/*'
+
+    # Assurer que le répertoire des entités et de l'injection de dépendances est bien exclu
     App\:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    # Si tu as des services spécifiques à ajouter, tu peux les déclarer ici, mais n'oublie pas d'adapter en fonction de tes besoins.
+    # Par exemple

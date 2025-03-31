@@ -5,20 +5,33 @@
         <h1 class="text-3xl font-semibold text-gray-800 text-center mb-6">Créer une publication</h1>
 
         {{ form_start(form) }}
-
+        
         <!-- Titre de la publication -->
         <div class="mb-4">
             {{ form_row(form.title, {
                 'label': 'Titre',
                 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
             }) }}
+            {{ form_errors(form.title) }}
         </div>
 
         <!-- Contenu de la publication -->
         <div class="mb-4">
             {{ form_widget(form.content, {
-                'attr': {'placeholder': 'Écrivez votre contenu ici...', 'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
+                'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'Écrivez votre contenu ici...'}
             }) }}
+            {{ form_errors(form.content) }}
+        </div>
+
+        <!-- Tags -->
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium mb-2">Tags</label>
+            <div class="relative">
+                {{ form_widget(form.tags, {
+                    'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
+                }) }}
+                {{ form_errors(form.tags) }}
+            </div>
         </div>
 
         <!-- Image -->
@@ -26,12 +39,7 @@
             {{ form_row(form.image, {
                 'attr': {'class': 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'}
             }) }}
-        </div>
-
-        <!-- Champ de saisie des tags -->
-        <div class="mb-4">
-            <label for="article_tagsInput" class="block text-sm font-medium text-gray-700">Tags (séparés par des virgules)</label>
-            <input type="text" id="article_tagsInput" name="article[tagsInput]" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Exemple : technologie, innovation, start-up" />
+            {{ form_errors(form.image) }}
         </div>
 
         <!-- Bouton de soumission -->

@@ -1,14 +1,10 @@
-<?php
-
+<?php // src/Repository/TagRepository.php
 namespace App\Repository;
 
 use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Tag>
- */
 class TagRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +12,14 @@ class TagRepository extends ServiceEntityRepository
         parent::__construct($registry, Tag::class);
     }
 
-    //    /**
-    //     * @return Tag[] Returns an array of Tag objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Tag
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    // Ajouter une méthode de recherche par nom
+    public function findByNameLike($searchTerm)
+    {
+        // Utilisation du query builder pour rechercher les tags contenant $searchTerm dans leur nom
+        return $this->createQueryBuilder('t')
+            ->where('t.name LIKE :searchTerm')
+            ->setParameter('searchTerm', '%' . $searchTerm . '%') // Le % permet de chercher des correspondances partielles
+            ->getQuery()
+            ->getResult();
+    }
 }

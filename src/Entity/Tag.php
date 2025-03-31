@@ -1,41 +1,35 @@
 <?php
-
-// src/Entity/Tag.php
-
 namespace App\Entity;
 
-use App\Repository\TagRepository;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TagRepository::class)]
-#[ORM\Table(name: 'tag')]  // Nom de la table Tag
+#[ORM\Entity(repositoryClass: "App\Repository\TagRepository")]
+#[ORM\Table(name: "tag")]
 class Tag
 {
-    #[ORM\ManyToMany(targetEntity: 'App\Entity\Article', mappedBy: 'tags')]
-    private Collection $articles;
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(type: "string", length: 100)]
     private ?string $name = null;
+
+    #[ORM\ManyToMany(targetEntity: "App\Entity\Article", mappedBy: "tags")]
+    private Collection $articles;
 
     public function __construct()
     {
-        $this->articles = new ArrayCollection(); // Initialisation de la collection
+        $this->articles = new ArrayCollection();
     }
 
-    // Getter et Setter pour l'ID
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    // Getter et Setter pour le nom du tag
     public function getName(): ?string
     {
         return $this->name;
@@ -47,7 +41,6 @@ class Tag
         return $this;
     }
 
-    // Getter pour la collection d'articles associés
     public function getArticles(): Collection
     {
         return $this->articles;

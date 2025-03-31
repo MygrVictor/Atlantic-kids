@@ -22,7 +22,8 @@ class HomeController extends AbstractController
         $content = [];
 
         foreach ($videos as $video) {
-            $video->type = 'video'; // Ajout du type
+            $videoData = (object) ['type' => 'video', 'data' => $video]; // Ajout du type
+            
             $content[] = $video;
         }
 

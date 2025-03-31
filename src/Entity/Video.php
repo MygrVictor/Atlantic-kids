@@ -9,6 +9,8 @@ use Symfony\UX\Turbo\Attribute\Broadcast;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotNull;
+
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
 #[Broadcast]
 #[ORM\HasLifecycleCallbacks] // Ajout de cette annotation pour activer les callbacks lifecycle
@@ -39,11 +41,11 @@ private ?string $url = null;
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $thumbnail;
 
-    #[ORM\ManyToOne(targetEntity: "App\Entity\User", inversedBy: "video")]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull(message: "L'utilisateur associé à la publication ne peut pas être nul.")]
-    private ?User $user = null;
-
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+    private $user;
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -116,11 +118,7 @@ private ?string $url = null;
         }
     }
 
-    // Méthode pour récupérer les "likes" associés à cette vidéo
-    public function getLikes(): Collection
-    {
-        return $this->likes;
-    }
+   
 
     public function getUser(): ?User
     {
@@ -159,5 +157,25 @@ private ?string $url = null;
 
         return $this;
     }
+    public function getLikes(): array
+{
+    return $this->likes->toArray();
+}
+
+public function addLike(Like $like): self
+{
+    if (!$this->likes->contains($like)) {
+        $this->likes[] = $like;
+    }
+
+    return $this;
+}
+
+public function removeLike(Like $like): self
+{
+    $this->likes->removeElement($like);
+    return $this;
+}
+
 }
 

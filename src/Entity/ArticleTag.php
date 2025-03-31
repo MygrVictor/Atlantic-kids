@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Article;
+use App\Entity\Tag;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'article_tag')] // Table de liaison entre article et tag
