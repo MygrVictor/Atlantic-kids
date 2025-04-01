@@ -4,6 +4,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Article;
+use App\Entity\Comment;
+use App\Entity\Video;
+use App\Entity\Tag;
+
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -34,8 +39,22 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Atlantic Kids');
     }
 
-    public function configureMenuItems(): iterable
-    {
-        yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
-    }
+   
+        public function configureMenuItems(): iterable
+{
+    yield MenuItem::section('General');
+    yield MenuItem::linkToCrud('Users', 'fas fa-user', User::class);
+    yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', Article::class);
+    yield MenuItem::linkToCrud('Comments', 'fas fa-comments', Comment::class);
+
+    yield MenuItem::section('Media');
+    yield MenuItem::linkToCrud('Videos', 'fas fa-video', Video::class);
+  
+
+    yield MenuItem::section('Settings');
+    yield MenuItem::linkToRoute('Profile', 'fas fa-cog', 'app_profile');
+    yield MenuItem::linkToLogout('Logout', 'fas fa-sign-out-alt');
 }
+
+    }
+

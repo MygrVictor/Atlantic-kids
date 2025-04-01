@@ -22,6 +22,12 @@ class Video
      */
     private $createdAt; 
 
+
+     /**
+     * @ORM\Column(type="string")
+     */
+    private $type;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -49,7 +55,7 @@ private ?string $url = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
     public function __construct()
@@ -180,5 +186,16 @@ public function setCreatedAt(?\DateTimeImmutable $createdAt): self
     $this->created_at = $createdAt;
     return $this;
 }
+public function getType(): ?string
+    {
+        return $this->type;
+    }
 
+    // Setter
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
 }

@@ -3,6 +3,7 @@
 {% block title %}Vidéo: {{ video.title }}{% endblock %}
 
 {% block body %}
+<div class="ml-64 p-4">
     <div class="container mt-5">
         <h1>{{ video.title }}</h1>
         
@@ -11,17 +12,14 @@
             <iframe width="100%" height="500" src="{{ video.url }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
-        <!-- Affichage de la vignette -->
-        <div class="thumbnail">
-            <img src="{{ video.thumbnail }}" alt="Thumbnail" class="img-fluid">
-        </div>
+        
 
         <div class="video-details mt-4">
             <p><strong>Description:</strong> {{ video.description|default('Aucune description disponible') }}</p>
             <p><strong>Publié le:</strong> {{ video.createdAt|date('d M Y') }}</p>
             
             <!-- Affichage de l'utilisateur qui a publié la vidéo -->
-            <p><strong>Publié par:</strong> {{ video.user.username }}</p>
+            <p><strong>Publié par:</strong> {{ video.user ? video.user.username }}</p>
         </div>
 
         <!-- Lien pour revenir à la liste des vidéos -->
@@ -29,4 +27,5 @@
             <a href="{{ path('video_index') }}" class="btn btn-primary">Retour à la liste des vidéos</a>
         </div>
     </div>
+</div>
 {% endblock %}

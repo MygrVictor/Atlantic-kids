@@ -69,6 +69,12 @@ private ?string $profilPicture = 'default.jpg'; // Assurez-vous de définir une 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: "App\Entity\Video")]
 private Collection $videos;
 
+ /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    private $user;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -214,6 +220,15 @@ public function getVideos(): Collection
     return $this->videos;
 }
 
+public function getUser(): ?User
+{
+    return $this->user;
+}
 
+public function setUser(?User $user): self
+{
+    $this->user = $user;
+    return $this;
+}
 
 }
