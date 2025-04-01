@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
-#[ORM\Table(name: 'comment')]  // Assurez-vous que le nom de la table soit correct
 class Comment
 {
     #[ORM\Id]
@@ -17,27 +17,22 @@ class Comment
     private ?string $content = null;
 
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTime $created_at = null;
+    private ?\DateTime $createdAt = null;
 
-    // Colonnes polymorphiques
-    #[ORM\Column(type: 'integer')]
-    private ?int $commentable_id = null;
+    // Polymorphic relation
+    #[ORM\Column(name: "target_type")]
+    private string $targetType;
 
-    #[ORM\Column(length: 255)]
-    private ?string $commentable_type = null;
+    #[ORM\Column(name: "target_id")]
+    private int $targetId;
 
-    // Relation avec l'utilisateur
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    // Relation avec les likes
-    #[ORM\OneToMany(mappedBy: 'comment', targetEntity: Like::class)]
-    private $likes;
-
     public function __construct()
     {
-        $this->likes = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -58,34 +53,34 @@ class Comment
 
     public function getCreatedAt(): ?\DateTime
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $created_at): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
         return $this;
     }
 
-    public function getCommentableId(): ?int
+    public function getTargetType(): string
     {
-        return $this->commentable_id;
+        return $this->targetType;
     }
 
-    public function setCommentableId(int $commentable_id): self
+    public function setTargetType(string $targetType): self
     {
-        $this->commentable_id = $commentable_id;
+        $this->targetType = $targetType;
         return $this;
     }
 
-    public function getCommentableType(): ?string
+    public function getTargetId(): int
     {
-        return $this->commentable_type;
+        return $this->targetId;
     }
 
-    public function setCommentableType(string $commentable_type): self
+    public function setTargetId(int $targetId): self
     {
-        $this->commentable_type = $commentable_type;
+        $this->targetId = $targetId;
         return $this;
     }
 
@@ -100,8 +95,11 @@ class Comment
         return $this;
     }
 
-    public function getLikes()
+    /**
+     * Récupère dynamiquement l'entité cible associée au commentaire
+     */
+    public function getTargetEntity($entityManager)
     {
-        return $this->likes;
+        return $entityManager->getRepository($this->targetType)->find($this->targetId);
     }
 }

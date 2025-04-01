@@ -14,8 +14,14 @@ use Symfony\Component\Validator\Constraints\NotNull;
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
 #[Broadcast]
 #[ORM\HasLifecycleCallbacks] // Ajout de cette annotation pour activer les callbacks lifecycle
-class Video
+class Video 
 {
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $createdAt; 
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -96,18 +102,6 @@ private ?string $url = null;
         return $this;
     }
 
-    
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
 
     
     #[ORM\PrePersist]
@@ -176,6 +170,15 @@ public function removeLike(Like $like): self
     $this->likes->removeElement($like);
     return $this;
 }
-
+public function getCreatedAt(): ?\DateTimeImmutable
+{
+    return $this->created_at;
 }
 
+public function setCreatedAt(?\DateTimeImmutable $createdAt): self
+{
+    $this->created_at = $createdAt;
+    return $this;
+}
+
+}

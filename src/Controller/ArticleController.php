@@ -2,8 +2,11 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment; 
 use App\Form\ArticleType;
+use App\Form\CommentType; 
 use App\Repository\ArticleRepository;
+use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -66,47 +69,76 @@ final class ArticleController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
-    #[Route('/article/{id}', name: 'article_show')]
-    public function show($id, ArticleRepository $articleRepository): Response
+    
+    #[Route('/article/{id}/delete', name: 'article_delete', methods: ['POST'])]
+    public function delete($id, ArticleRepository $articleRepository, EntityManagerInterface $entityManager): Response
     {
-        // Récupérer l'article par son ID via le repository
+       
         $article = $articleRepository->find($id);
 
-        // Si l'article n'existe pas, on renvoie une erreur 404
+       
         if (!$article) {
             throw $this->createNotFoundException('Article non trouvé');
         }
 
-        // Passer l'article au template
-        return $this->render('article/show.html.twig', [
-            'article' => $article,
-        ]);
+        
+        if ($article->getUser() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer cet article.');
+            return $this->redirectToRoute('app_article');
+        }
+
+      
+        $entityManager->remove($article);
+        $entityManager->flush();
+
+   
+        $this->addFlash('success', 'Article supprimé avec succès.');
+        return $this->redirectToRoute('app_article');
     }
-    #[Route('/article/{id}/delete', name: 'article_delete', methods: ['POST'])]
-public function delete($id, ArticleRepository $articleRepository, EntityManagerInterface $entityManager): Response
-{
-    // Récupérer l'article par son ID
+    #[Route('/article/{id}', name: 'article_show', methods: ['GET', 'POST'])]
+public function show(
+    int $id, 
+    ArticleRepository $articleRepository, 
+    CommentRepository $commentRepository, 
+    Request $request, 
+    EntityManagerInterface $entityManager
+): Response {
     $article = $articleRepository->find($id);
 
-    // Vérifier si l'article existe
     if (!$article) {
         throw $this->createNotFoundException('Article non trouvé');
     }
 
-    // Vérifier si l'utilisateur est l'auteur de l'article
-    if ($article->getUser() !== $this->getUser()) {
-        $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer cet article.');
-        return $this->redirectToRoute('app_article');
+    // Récupération des commentaires liés à l'article
+    $comments = $commentRepository->findCommentsByTarget(Article::class, $id);
+
+   
+
+    // Création du formulaire de commentaire
+    $comment = new Comment();
+    $commentForm = $this->createForm(CommentType::class, $comment);
+    $commentForm->handleRequest($request);
+
+    if ($commentForm->isSubmitted() && $commentForm->isValid()) {
+        $comment->setTargetType(Article::class);
+        $comment->setTargetId($article->getId());
+        $comment->setUser($this->getUser());
+        $comment->setCreatedAt(new \DateTime());
+
+        $entityManager->persist($comment);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('article_show', ['id' => $article->getId()]);
     }
 
-    // Supprimer l'article
-    $entityManager->remove($article);
-    $entityManager->flush();
-
-    // Rediriger vers la liste des articles après la suppression
-    $this->addFlash('success', 'Article supprimé avec succès.');
-    return $this->redirectToRoute('app_article');
+    return $this->render('article/show.html.twig', [
+        'article' => $article,
+        'comments' => $comments,
+        'commentForm' => $commentForm->createView(),
+    ]);
 }
+    
+   
+
 
 }
